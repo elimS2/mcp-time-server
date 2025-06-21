@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "mcp-time-server": {
+      "command": "python",
+      "args": ["-m", "mcp_time_server.server"],
+      "cwd": ".",
+      "env": {}
+    }
+  }
+} 
