@@ -65,27 +65,39 @@ Full ISO: 2025-01-15T10:30:45.123456Z
 
 ## Cursor IDE Integration
 
-### Global Configuration
+### Global Configuration (Recommended)
 
-1. Open Cursor IDE settings
-2. Navigate to MCP settings
-3. Add the following configuration:
+**For permanent integration across all projects:**
+
+1. Create the global MCP configuration file:
+   - **Windows**: `C:\Users\[USERNAME]\.cursor\mcp.json`
+   - **macOS/Linux**: `~/.cursor/mcp.json`
+
+2. Add the following configuration:
 
 ```json
 {
   "mcpServers": {
-    "mcp-time-server": {
+    "time-server": {
       "command": "python",
       "args": ["-m", "mcp_time_server.server"],
-      "cwd": "/path/to/mcp-time-server"
+      "cwd": "/full/path/to/mcp-time-server/src",
+      "env": {
+        "PYTHONPATH": "/full/path/to/mcp-time-server/src"
+      }
     }
   }
 }
 ```
 
-### Alternative: Local mcp_config.json
+3. Restart Cursor IDE
+4. Check `Tools & Integrations` > `MCP` to verify the server is enabled
 
-Copy the provided `mcp_config.json` to your Cursor IDE configuration directory.
+**The server will now automatically start with Cursor IDE and work across all projects!**
+
+### Project-Specific Configuration
+
+For project-only usage, create `.cursor/mcp.json` in your project directory with the same structure.
 
 ## Development
 
@@ -141,6 +153,7 @@ print(get_current_time_utc("timestamp"))
 1. **Import errors**: Make sure the package is installed with `pip install -e .`
 2. **MCP connection issues**: Verify the server path in your MCP configuration
 3. **Permission errors**: Ensure Python has necessary permissions to run the server
+4. **Server not appearing**: Check that the `.cursor` directory exists and `mcp.json` is properly formatted
 
 ### Windows PowerShell
 
@@ -148,6 +161,34 @@ If you encounter issues with `&&` operator in PowerShell, use:
 
 ```powershell
 cd src; python -m mcp_time_server.server
+```
+
+### Verifying Server Status
+
+**Check if server is running:**
+```powershell
+# Windows
+tasklist | findstr python
+wmic process where "name='python.exe'" get ProcessId,CommandLine /format:list
+
+# macOS/Linux  
+ps aux | grep mcp_time_server
+```
+
+**Test connection in Cursor:**
+Ask the AI assistant to get current time - it should use the MCP Time Server automatically.
+
+### Manual Server Management
+
+**Start server manually:**
+```bash
+cd src && python -m mcp_time_server.server
+```
+
+**Stop server:**
+```powershell
+# Windows (replace PID with actual process ID)
+taskkill /PID [PID] /F
 ```
 
 ## License
@@ -168,4 +209,10 @@ MIT License - see LICENSE file for details.
 - Initial release
 - Basic UTC time functionality
 - MCP protocol compliance
-- Cursor IDE integration support 
+- FastMCP integration for simplified server management
+- Global Cursor IDE configuration support
+- Multiple time formats (ISO, datetime, timestamp)
+- Comprehensive testing and documentation
+- Process management and troubleshooting tools
+- GitHub repository with MIT license
+- Live testing confirmed across restart cycles 
